@@ -44,10 +44,6 @@ def evaluate_experiment(indep_training, dep_training, indep_testing, dep_testing
                 else: A += 1
         pd = D / (B + D + .001)
         prec = D / (C+ D + .001)
-        if configuration[1] ==0.5 and  configuration[2] == 3.0 and configuration[0] == 145 :
-            print configuration, 2 * (pd * prec) / (pd + prec + .001)
-            import pdb
-            pdb.set_trace()
         return 2 * (pd * prec) / (pd + prec + .001)
 
     # Import the random forest package
@@ -60,7 +56,7 @@ def evaluate_experiment(indep_training, dep_training, indep_testing, dep_testing
                                     min_samples_split = configuration[2],
                                     min_samples_leaf = configuration[3],
                                     max_leaf_nodes = int(configuration[4]),
-                                    random_state=10
+                                    random_state=1
                                     )
     # import pdb
     # pdb.set_trace()
@@ -74,9 +70,12 @@ def evaluate_experiment(indep_training, dep_training, indep_testing, dep_testing
     return get_F(dep_testing, output)
 
 
-def criteria(name="", training=[], testing="", configuration_file=None):
+def criteria(name="", training=[], tuning=[], testing=[], configuration_file=None):
     indep_training_data = []
     dep_training_data = []
+
+    indep_tuning_data = []
+    dep_tuning_data = []
 
     indep_testing_data = []
     dep_testing_data = []
@@ -86,6 +85,11 @@ def criteria(name="", training=[], testing="", configuration_file=None):
         indep_training_data.extend([c.decisions for c in contents])
         dep_training_data.extend([c.objective for c in contents])
 
+    for tune in tuning:
+        contents = get_data(tune)
+        indep_tuning_data.extend([c.decisions for c in contents])
+        dep_tuning_data.extend([c.objective for c in contents])
+
     for test in testing:
         contents = get_data(test)
         indep_testing_data.extend([c.decisions for c in contents])
@@ -93,24 +97,85 @@ def criteria(name="", training=[], testing="", configuration_file=None):
 
     configurations = [map(float,c) for c in get_configurations(configuration_file)]
 
-    scores = [evaluate_experiment(indep_training_data, dep_training_data, indep_testing_data, dep_testing_data, configuration)
-              for  configuration in configurations]
+    scores = [evaluate_experiment(indep_training_data, dep_training_data, indep_tuning_data, dep_tuning_data, configuration)
+              for configuration in configurations]
 
     sorted_scores_idx = sorted(range(len(scores)), key=lambda k: scores[k])
 
-    print name, "|Best Possible Score of : ",  round(scores[sorted_scores_idx[-1]], 3), \
-        " can be achieved using: ", configurations[sorted_scores_idx[-1]]
+    testing_configuration = configurations[sorted_scores_idx[-1]]
+
+    testing_score = evaluate_experiment(indep_training_data, dep_training_data, indep_testing_data, dep_testing_data, testing_configuration)
+
+
+
+
+    print name, "|Best Possible Score of : ",  round(testing_score, 3), \
+        " can be achieved using: ", testing_configuration
 
 
 
 if __name__ == "__main__":
 
-    criteria(name="1", training=["./Data/ant/ant-1.3.csv", "./Data/ant/ant-1.4.csv"],
-             testing=["./Data/ant/ant-1.4.csv"],
+    print "ANT"
+    criteria(name="1", training=["./Data/ant/ant-1.3.csv"], tuning=["./Data/ant/ant-1.4.csv"],
+             testing=["./Data/ant/ant-1.5.csv"],
              configuration_file="./configurations.txt")
-    criteria(name="2", training=["./Data/ant/ant-1.4.csv", "./Data/ant/ant-1.5.csv"],
+    criteria(name="2", training=["./Data/ant/ant-1.4.csv"], tuning=["./Data/ant/ant-1.5.csv"],
              testing=["./Data/ant/ant-1.6.csv"],
              configuration_file="./configurations.txt")
-    criteria(name="3", training=["./Data/ant/ant-1.5.csv", "./Data/ant/ant-1.6.csv"],
+    criteria(name="3", training=["./Data/ant/ant-1.5.csv"], tuning=["./Data/ant/ant-1.6.csv"],
              testing=["./Data/ant/ant-1.7.csv"],
              configuration_file="./configurations.txt")
+
+    print "CAMEL"
+    criteria(name="1", training=["./Data/camel/camel-1.0.csv"], tuning=[ "./Data/camel/camel-1.2.csv"],
+         testing=["./Data/camel/camel-1.4.csv"], configuration_file="./configurations.txt")
+    criteria(name="2", training=["./Data/camel/camel-1.2.csv"], tuning=[ "./Data/camel/camel-1.4.csv"],
+         testing=["./Data/camel/camel-1.6.csv"], configuration_file="./configurations.txt")
+
+    print "IVY"
+    criteria(name="1", training=["./Data/ivy/ivy-1.1.csv"], tuning=[ "./Data/ivy/ivy-1.4.csv"],
+         testing=["./Data/ivy/ivy-2.0.csv"], configuration_file="./configurations.txt")
+
+    print "JEDIT"
+    criteria(name="1", training=["./Data/jedit/jedit-3.2.csv"], tuning=[ "./Data/jedit/jedit-4.0.csv"],
+         testing=["./Data/jedit/jedit-4.1.csv"], configuration_file="./configurations.txt")
+    criteria(name="2", training=["./Data/jedit/jedit-4.0.csv"], tuning=[ "./Data/jedit/jedit-4.1.csv"],
+         testing=["./Data/jedit/jedit-4.2.csv"], configuration_file="./configurations.txt")
+    criteria(name="3", training=["./Data/jedit/jedit-4.1.csv"], tuning=[ "./Data/jedit/jedit-4.2.csv"],
+         testing=["./Data/jedit/jedit-4.3.csv"], configuration_file="./configurations.txt")
+
+    print "LOG4J"
+    criteria(name="1", training=["./Data/log4j/log4j-1.0.csv"], tuning=[ "./Data/log4j/log4j-1.1.csv"],
+         testing=["./Data/log4j/log4j-1.2.csv"], configuration_file="./configurations.txt")
+
+    print "LUCENE"
+    criteria(name="1", training=["./Data/lucene/lucene-2.0.csv"], tuning=[ "./Data/lucene/lucene-2.2.csv"],
+         testing=["./Data/lucene/lucene-2.4.csv"], configuration_file="./configurations.txt")
+
+    print "POI"
+    criteria(name="1", training=["./Data/poi/poi-1.5.csv"], tuning=[ "./Data/poi/poi-2.0.csv"],
+         testing=["./Data/poi/poi-2.5.csv"], configuration_file="./configurations.txt")
+    criteria(name="2", training=["./Data/poi/poi-2.0.csv"], tuning=[ "./Data/poi/poi-2.5.csv"],
+         testing=["./Data/poi/poi-3.0.csv"], configuration_file="./configurations.txt")
+
+    print "SYNAPSE"
+    criteria(name="1", training=["./Data/synapse/synapse-1.0.csv"], tuning=[ "./Data/synapse/synapse-1.1.csv"],
+         testing=["./Data/synapse/synapse-1.2.csv"], configuration_file="./configurations.txt")
+
+    print "VELOCITY"
+    criteria(name="1", training=["./Data/velocity/velocity-1.4.csv"], tuning=[ "./Data/velocity/velocity-1.5.csv"],
+         testing=["./Data/velocity/velocity-1.6.csv"], configuration_file="./configurations.txt")
+
+    print "XERCES"
+    criteria(name="1", training=["./Data/xerces/xerces-1.1.csv"], tuning=[ "./Data/xerces/xerces-1.2.csv"],
+         testing=["./Data/xerces/xerces-1.3.csv"], configuration_file="./configurations.txt")
+    criteria(name="2", training=["./Data/xerces/xerces-1.2.csv"], tuning=[ "./Data/xerces/xerces-1.3.csv"],
+         testing=["./Data/xerces/xerces-1.4.csv"], configuration_file="./configurations.txt")
+
+
+
+
+
+
+

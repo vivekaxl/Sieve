@@ -26,6 +26,9 @@ def get_hotspot_scores(data):
 clusters = pickle.load( open("clusters_3.p", "rb"))
 
 print "Length of Cluster: ", len(clusters)
+import pdb
+pdb.set_trace()
+
 for i, cluster in enumerate(clusters):
     t_cluster = [list(c) for c in cluster]
     scores = get_hotspot_scores(t_cluster)
