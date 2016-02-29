@@ -1,9 +1,9 @@
 from __future__ import division
-estimators = xrange(50, 151, 5)
-max_features = range(1, 10, 1)
-min_samples_split = xrange(1,21, 2)
-min_samples_leaf = xrange(2,21, 2)
-max_leaf_nodes = xrange(10,51, 5)
+estimators = [50, 70,  90,  110, 130, 150]
+max_features = [0.1,  0.4, 0.7,  1.0]
+min_samples_split = [1,  9,  17]
+min_samples_leaf = [2, 4, 6, 8, 10]
+max_leaf_nodes = [10, 15, 20, 25, 30, 35, 40, 45, 50]
 
 count = 1
 for a in estimators:
@@ -11,4 +11,4 @@ for a in estimators:
         for c in min_samples_split:
             for d in min_samples_leaf:
                 for e in max_leaf_nodes:
-                    print a, ",", b/10, ",", c, ",", d, ",", e
+                    print a, ",", b, ",", c, ",", d, ",", e

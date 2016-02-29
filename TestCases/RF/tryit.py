@@ -23,7 +23,7 @@ def get_hotspot_scores(data):
     return hotspot_scores
 
 
-clusters = pickle.load( open("clusters_3.p", "rb"))
+clusters = pickle.load( open("grid.p", "rb"))
 
 print "Length of Cluster: ", len(clusters)
 import pdb

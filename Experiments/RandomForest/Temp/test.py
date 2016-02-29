@@ -106,9 +106,6 @@ def criteria(name="", training=[], tuning=[], testing=[], configuration_file=Non
 
     testing_score = evaluate_experiment(indep_training_data, dep_training_data, indep_testing_data, dep_testing_data, testing_configuration)
 
-
-
-
     print name, "|Best Possible Score of : ",  round(testing_score, 3), \
         " can be achieved using: ", testing_configuration
 

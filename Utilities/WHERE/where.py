@@ -91,7 +91,7 @@ def _test(dir='../Data/'):
     train = pd.concat(files)
     clusters = where(train)
     from pickle import dump, load
-    dump( clusters, open( "clusters_3.p", "wb" ) )
+    dump( clusters, open( "grid.p", "wb" ) )
 
     # ----- ::DEBUG:: -----
     set_trace()
